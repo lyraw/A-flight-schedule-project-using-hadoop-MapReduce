@@ -1,0 +1,60 @@
+<workflow-app xmlns='uri:oozie:workflow:0.1' name='oozie'>
+	<start to='schedule' />
+	<action name='schedule'>
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>default</value>
+				</property>
+			</configuration>
+			<main-class>Schedule</main-class>
+			<java-opts>-Xmx2048m</java-opts>
+			<arg>input output1</arg>
+		</java>
+		<ok to='taxi' />
+		<error to='fail' />
+	</action>
+	<action name='taxi'>
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>default</value>
+				</property>
+			</configuration>
+			<main-class>Taxi</main-class>
+			<java-opts>-Xmx2048m</java-opts>
+			<arg>input output2</arg>
+		</java>
+		<ok to='cancel' />
+		<error to='fail' />
+	</action>
+	<action name='cancel'>
+		<java>
+			<job-tracker>${jobTracker}</job-tracker>
+			<name-node>${nameNode}</name-node>
+			<configuration>
+				<property>
+					<name>mapred.job.queue.name</name>
+					<value>default</value>
+				</property>
+			</configuration>
+			<main-class>Cancel</main-class>
+			<java-opts>-Xmx2048m</java-opts>
+			<arg>inout output3</arg>
+		</java>
+		<ok to='end' />
+		<error to='fail' />
+	</action>
+	<kill name='fail'>
+		<message>Java failed, error
+			message[${wf:errorMessage(wf:lastErrorNode())}]
+		</message>
+	</kill>
+	<end name='end' />
+</workflow-app> 
